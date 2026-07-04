@@ -50,7 +50,19 @@ app. Restaurant discovery is a manually-curated URL list (`scraper/sources.mjs`,
 Google Places API setup was deliberately deferred). Geocoding via free OSM Nominatim. Parses
 schema.org Menu/MenuItem structured data; sites without it are skipped rather than scraped with
 fragile generic HTML heuristics. Fuzzy dedup (name + address, `pg_trgm`) prevents duplicate
-restaurant rows at ingestion.
+restaurant rows at ingestion. Pages are rendered with a real headless browser (`scraper/browser.mjs`,
+Playwright) before parsing, not a plain fetch, since real sites are often JavaScript-rendered.
+
+**Real-world research (post-step-9, not yet reflected in any ingested data):** checked 10 real
+sites for usable structured data — 4 major fast-food chains (Tim Hortons, Wendy's, Mary Brown's
+rendered fully but emit zero Restaurant/Menu schema; McDonald's blocks automated browser requests
+outright) and 6 real independent Ottawa restaurants (Cocotte, Riviera, Supply & Demand, Alora,
+SideDoor, Rabbit Hole). One partial hit: **SideDoor Ottawa** (Wix-built) emits real `Restaurant`
+schema — accurate name/address/geo/hours — but, like every other site checked, no `MenuItem` data
+for actual dishes. Conclusion: menu-item-level structured data is genuinely rare in the wild, rarer
+than restaurant-level data. Options to revisit later: keep hunting for a fully-compatible site,
+extend the scraper to do partial ingestion (restaurant-only, no items, relying on step 8's
+crowd-contribution flow to fill in dishes), or leave as a documented limitation.
 
 ### ⬜ Step 10 — Restaurant claim flow
 Not started.
@@ -70,7 +82,8 @@ Not started.
 
 - Email confirmation is off — re-enable in `supabase/config.toml` before launch.
 - `scraper/sources.mjs` has no real restaurant URLs yet — the pipeline is proven against test
-  fixtures but hasn't ingested a real site.
+  fixtures, but real-world research found menu-item-level structured data genuinely rare (see step
+  9 notes above) and hasn't ingested a real site yet.
 - The footer's "claim or request removal" link is a placeholder `mailto:` until step 10 builds the
   real claim flow.
 - No deployment/hosting exists yet.
