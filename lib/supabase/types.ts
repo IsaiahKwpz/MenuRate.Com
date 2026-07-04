@@ -250,7 +250,7 @@ export type Database = {
           created_at: string
           id: string
           reason: string
-          reporter_id: string
+          reporter_id: string | null
           status: Database["public"]["Enums"]["report_status"]
           target_id: string
           target_type: Database["public"]["Enums"]["report_target_type"]
@@ -259,7 +259,7 @@ export type Database = {
           created_at?: string
           id?: string
           reason: string
-          reporter_id: string
+          reporter_id?: string | null
           status?: Database["public"]["Enums"]["report_status"]
           target_id: string
           target_type: Database["public"]["Enums"]["report_target_type"]
@@ -268,7 +268,7 @@ export type Database = {
           created_at?: string
           id?: string
           reason?: string
-          reporter_id?: string
+          reporter_id?: string | null
           status?: Database["public"]["Enums"]["report_status"]
           target_id?: string
           target_type?: Database["public"]["Enums"]["report_target_type"]
