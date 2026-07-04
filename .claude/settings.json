@@ -22,7 +22,11 @@
       "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-contributions.mjs)",
       "WebSearch",
       "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-scraper.mjs)",
-      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-footer.mjs)"
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-footer.mjs)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; npm install)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-browser-fetch.mjs)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node research-chains.mjs)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node research-sidedoor.mjs)"
     ],
     "additionalDirectories": [
       "c:\\Users\\IsaiahK\\Documents\\Personal\\MenuRate.Com\\app\\menu-items"

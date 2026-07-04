@@ -14,6 +14,7 @@ import { throttle } from "./rateLimiter.mjs";
 import { extractRestaurantData } from "./parse.mjs";
 import { geocode } from "./geocode.mjs";
 import { createScraperClient, ingestRestaurant } from "./ingest.mjs";
+import { fetchRenderedHtml, closeBrowser } from "./browser.mjs";
 
 export const USER_AGENT = "MenuRateScraper/0.1 (+https://github.com/IsaiahKwpz/MenuRate.Com)";
 
@@ -44,12 +45,11 @@ export async function scrapeSource(source, supabase) {
   }
 
   await throttle(source.url);
-  const res = await fetch(source.url, { headers: { "User-Agent": USER_AGENT } });
-  if (!res.ok) {
-    console.log(`Skipped: fetch failed (HTTP ${res.status}).`);
+  const { ok, status, html } = await fetchRenderedHtml(source.url, USER_AGENT);
+  if (!ok) {
+    console.log(`Skipped: fetch failed (HTTP ${status}).`);
     return { url: source.url, status: "fetch-failed" };
   }
-  const html = await res.text();
 
   const data = extractRestaurantData(html);
   if (!data || data.items.length === 0) {
@@ -94,13 +94,17 @@ async function main() {
   const supabase = createScraperClient(env);
 
   const results = [];
-  for (const source of sources) {
-    try {
-      results.push(await scrapeSource(source, supabase));
-    } catch (err) {
-      console.error(`Error scraping ${source.url}:`, err.message);
-      results.push({ url: source.url, status: "error", error: err.message });
+  try {
+    for (const source of sources) {
+      try {
+        results.push(await scrapeSource(source, supabase));
+      } catch (err) {
+        console.error(`Error scraping ${source.url}:`, err.message);
+        results.push({ url: source.url, status: "error", error: err.message });
+      }
     }
+  } finally {
+    await closeBrowser();
   }
 
   console.log("\n--- Summary ---");
