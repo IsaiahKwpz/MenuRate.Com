@@ -544,6 +544,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: undefined
       }
+      find_matching_restaurant: {
+        Args: { candidate_address: string; candidate_name: string }
+        Returns: string
+      }
       is_low_trust: { Args: { target_user_id: string }; Returns: boolean }
       merge_restaurants: {
         Args: { duplicate_id: string; primary_id: string }
@@ -563,6 +567,8 @@ export type Database = {
           restaurant_name: string
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       edit_status: "pending" | "approved" | "rejected"

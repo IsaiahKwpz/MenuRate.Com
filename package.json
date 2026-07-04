@@ -10,7 +10,8 @@
     "db:link": "supabase link",
     "db:push": "supabase db push",
     "db:diff": "supabase db diff",
-    "db:types": "supabase gen types typescript --linked > lib/supabase/types.ts"
+    "db:types": "supabase gen types typescript --linked > lib/supabase/types.ts",
+    "scrape": "node scraper/index.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

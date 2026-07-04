@@ -19,7 +19,10 @@
       "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-reports.mjs)",
       "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-debug5.mjs)",
       "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-devissue.mjs)",
-      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-contributions.mjs)"
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-contributions.mjs)",
+      "WebSearch",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-scraper.mjs)",
+      "PowerShell($env:PATH = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); Set-Location \"C:\\\\Users\\\\IsaiahK\\\\Documents\\\\Personal\\\\MenuRate.Com\"; node verify-footer.mjs)"
     ],
     "additionalDirectories": [
       "c:\\Users\\IsaiahK\\Documents\\Personal\\MenuRate.Com\\app\\menu-items"
