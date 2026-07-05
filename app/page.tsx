@@ -46,20 +46,20 @@ export default async function Home() {
       </section>
 
       {stats.restaurantCount > 0 && (
-        <div className="mt-10 flex divide-x divide-rule border border-rule">
-          <div className="flex-1 bg-surface px-5 py-4">
+        <div className="mt-10 grid grid-cols-3 divide-x divide-rule border border-rule">
+          <div className="min-w-0 bg-surface px-5 py-4">
             <span className="font-display block text-2xl font-extrabold text-rust">
               {stats.ratedRestaurantCount.toLocaleString()}
             </span>
             <span className="text-sm text-ink-soft">restaurants rated</span>
           </div>
-          <div className="flex-1 bg-surface px-5 py-4">
+          <div className="min-w-0 bg-surface px-5 py-4">
             <span className="font-display block text-2xl font-extrabold text-olive">
               {stats.dishCount.toLocaleString()}
             </span>
             <span className="text-sm text-ink-soft">dishes on the list</span>
           </div>
-          <div className="flex-1 bg-surface px-5 py-4">
+          <div className="min-w-0 bg-surface px-5 py-4">
             <span className="font-display block text-2xl font-extrabold" style={{ color: "#E8C87E" }}>
               {stats.independentCount.toLocaleString()}
             </span>
