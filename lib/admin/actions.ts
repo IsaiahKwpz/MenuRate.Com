@@ -60,6 +60,17 @@ export async function removeReport(
     if (rating) {
       await admin.rpc("decrement_trust_score", { target_user_id: rating.user_id });
     }
+  } else if (report.target_type === "photo") {
+    const { data: photo } = await admin
+      .from("photos")
+      .select("storage_path, uploaded_by")
+      .eq("id", report.target_id)
+      .single();
+    await admin.from("photos").update({ status: "rejected" }).eq("id", report.target_id);
+    if (photo) {
+      await admin.storage.from("photos").remove([photo.storage_path]);
+      await admin.rpc("decrement_trust_score", { target_user_id: photo.uploaded_by });
+    }
   }
 
   const { error } = await admin.from("reports").update({ status: "removed" }).eq("id", reportId);
@@ -264,6 +275,61 @@ export async function rejectRestaurantClaim(
     .update({ status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: adminUser.id })
     .eq("id", claimId);
   if (error) return { error: error.message };
+
+  revalidatePath("/admin/reports");
+  return { success: true };
+}
+
+export async function approvePendingPhoto(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const adminUser = await requireAdmin();
+  const photoId = formData.get("photoId") as string;
+
+  const admin = createAdminClient();
+  const { data: photo, error: fetchError } = await admin
+    .from("photos")
+    .select("target_type, target_id")
+    .eq("id", photoId)
+    .single();
+  if (fetchError || !photo) return { error: "Photo not found." };
+
+  const { error } = await admin
+    .from("photos")
+    .update({ status: "approved", reviewed_at: new Date().toISOString(), reviewed_by: adminUser.id })
+    .eq("id", photoId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/admin/reports");
+  revalidatePath(photo.target_type === "menu_item" ? `/menu-items/${photo.target_id}` : `/restaurants/${photo.target_id}`);
+  return { success: true };
+}
+
+export async function rejectPendingPhoto(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const adminUser = await requireAdmin();
+  const photoId = formData.get("photoId") as string;
+
+  const admin = createAdminClient();
+  const { data: photo, error: fetchError } = await admin
+    .from("photos")
+    .select("storage_path")
+    .eq("id", photoId)
+    .single();
+  if (fetchError || !photo) return { error: "Photo not found." };
+
+  const { error } = await admin
+    .from("photos")
+    .update({ status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: adminUser.id })
+    .eq("id", photoId);
+  if (error) return { error: error.message };
+
+  // Reclaim storage and avoid keeping rejected (potentially disallowed)
+  // content around any longer than necessary.
+  await admin.storage.from("photos").remove([photo.storage_path]);
 
   revalidatePath("/admin/reports");
   return { success: true };

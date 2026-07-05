@@ -3,11 +3,14 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMenuItemDetail, getRatingsForItem, getUserRating } from "@/lib/ratings/queries";
 import { getAppliedTagsForItem, getAvailableTagsForItem } from "@/lib/contributions/queries";
+import { getApprovedPhotosForTarget, getOwnPendingPhotosForTarget } from "@/lib/photos/queries";
 import { RatingBadge } from "@/components/rating-badge";
 import { RatingForm } from "@/components/rating-form";
 import { ReportButton } from "@/components/report-button";
 import { TagSection } from "@/components/tag-section";
 import { EditItemForm } from "@/components/edit-item-form";
+import { PhotoUploadForm } from "@/components/photo-upload-form";
+import { PhotoGallery } from "@/components/photo-gallery";
 
 export default async function MenuItemPage({
   params,
@@ -38,6 +41,12 @@ export default async function MenuItemPage({
   const userRating = user ? await getUserRating(supabase, itemId, user.id) : null;
   const isChain = restaurant.type === "chain" && restaurant.brand !== null;
 
+  const [approvedPhotos, ownPendingPhotos] = await Promise.all([
+    getApprovedPhotosForTarget(supabase, "menu_item", itemId),
+    user ? getOwnPendingPhotosForTarget(supabase, "menu_item", itemId, user.id) : Promise.resolve([]),
+  ]);
+  const photos = [...approvedPhotos, ...ownPendingPhotos];
+
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
       <Link href={`/restaurants/${restaurant.id}`} className="text-sm underline">
@@ -62,14 +71,21 @@ export default async function MenuItemPage({
         )}
       </div>
 
-      <div className="mt-2">
+      <div className="mt-2 flex flex-wrap items-center gap-3">
         <ReportButton
           targetType="menu_item"
           targetId={item.id}
           isSignedIn={!!user}
           currentPath={`/menu-items/${item.id}`}
         />
+        <PhotoUploadForm
+          targetType="menu_item"
+          targetId={item.id}
+          isSignedIn={!!user}
+          currentPath={`/menu-items/${item.id}`}
+        />
       </div>
+      <PhotoGallery photos={photos} isSignedIn={!!user} currentPath={`/menu-items/${item.id}`} />
 
       <section className="mt-6">
         <h2 className="mb-3 text-lg font-medium">Tags</h2>

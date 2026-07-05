@@ -288,6 +288,57 @@ export type Database = {
           },
         ]
       }
+      photos: {
+        Row: {
+          created_at: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["edit_status"]
+          storage_path: string
+          target_id: string
+          target_type: Database["public"]["Enums"]["report_target_type"]
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["edit_status"]
+          storage_path: string
+          target_id: string
+          target_type: Database["public"]["Enums"]["report_target_type"]
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["edit_status"]
+          storage_path?: string
+          target_id?: string
+          target_type?: Database["public"]["Enums"]["report_target_type"]
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photos_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -636,7 +687,7 @@ export type Database = {
       edit_status: "pending" | "approved" | "rejected"
       menu_item_status: "unverified" | "confirmed"
       report_status: "open" | "dismissed" | "removed"
-      report_target_type: "menu_item" | "restaurant" | "rating"
+      report_target_type: "menu_item" | "restaurant" | "rating" | "photo"
       restaurant_source: "scraped" | "claimed"
       restaurant_status: "active" | "closed" | "temporarily_closed"
       restaurant_type: "independent" | "chain"
@@ -774,7 +825,7 @@ export const Constants = {
       edit_status: ["pending", "approved", "rejected"],
       menu_item_status: ["unverified", "confirmed"],
       report_status: ["open", "dismissed", "removed"],
-      report_target_type: ["menu_item", "restaurant", "rating"],
+      report_target_type: ["menu_item", "restaurant", "rating", "photo"],
       restaurant_source: ["scraped", "claimed"],
       restaurant_status: ["active", "closed", "temporarily_closed"],
       restaurant_type: ["independent", "chain"],

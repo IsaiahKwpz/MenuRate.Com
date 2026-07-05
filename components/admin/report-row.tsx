@@ -16,6 +16,10 @@ export function ReportRow({ report }: { report: ReportWithPreview }) {
   return (
     <li className="rounded border p-4">
       <p className="font-medium">{report.preview}</p>
+      {report.photoUrl && (
+        // eslint-disable-next-line @next/next/no-img-element -- signed Supabase Storage URL
+        <img src={report.photoUrl} alt="" className="mt-2 h-32 w-32 rounded object-cover" />
+      )}
       <p className="text-sm text-gray-500">
         Reason: {report.reason} · Reported by {report.reporterName ?? "system (automated)"} ·{" "}
         {report.createdAtLabel}

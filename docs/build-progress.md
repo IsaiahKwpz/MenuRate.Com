@@ -3,7 +3,7 @@
 Tracks progress against the Build Order in [`menurate-spec.md`](menurate-spec.md) Section 11.
 Updated as steps complete — see git history for full detail on each one.
 
-## Status: 10 of 11 steps complete
+## Status: 11 of 11 steps complete
 
 ### ✅ Step 1 — Schema + Supabase setup
 Full Section 7 data model as Supabase migrations (profiles, brands, restaurants, menu_items, tags,
@@ -94,8 +94,18 @@ trust score (RLS-enforced via `is_restaurant_owner()`, not just app-level), and 
 into the pending queue for admin review. Footer's placeholder claim link now points people to the
 real per-restaurant claim button; a `mailto:` remains only for removal requests.
 
-### ⬜ Step 11 — Photo upload + proactive image moderation
-Not started.
+### ✅ Step 11 — Photo upload + proactive image moderation
+Signed-in users attach photos to a menu item or restaurant (with a required "I own this or have
+permission to share it" checkbox). Photos land in Supabase Storage (private `photos` bucket, all
+access brokered server-side via signed URLs — no direct client access) and a `photos` table row
+with `status = 'pending'`. **No automated moderation API is configured** — `IMAGE_MODERATION_API_KEY`
+in `.env.local` is an empty placeholder, same situation step 9 hit with geocoding — so
+`lib/moderation/scan.ts` is a documented stub and every upload holds for manual admin review on
+`/admin/reports` instead of an automated pass/fail. This is a stricter proactive posture than an
+API scan alone (100% human review before anything goes public), not a workaround; swap the stub for
+a real Rekognition/SafeSearch call whenever that key is populated. Photos are reportable too (added
+`'photo'` to `report_target_type`), and the admin Reports queue shows the actual image thumbnail for
+both pending-photo review and photo reports, since judging an image requires seeing it.
 
 ## Live infrastructure
 
@@ -112,4 +122,8 @@ Not started.
   is proven against test fixtures, but real-world research found menu-item-level structured data
   genuinely rare (see step 9 notes above). Real data now comes from the manual-research batch
   instead (`scripts/ingest-batch1.mjs`), not the automated scraper.
+- No automated image-moderation API is configured (`IMAGE_MODERATION_API_KEY` is an empty
+  placeholder) — every photo upload currently holds for manual admin review instead of an
+  automated pass/fail. Wire up AWS Rekognition or Google Vision SafeSearch in
+  `lib/moderation/scan.ts` when that's ready to reduce the manual review queue.
 - No deployment/hosting exists yet.

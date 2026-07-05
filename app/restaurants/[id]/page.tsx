@@ -3,10 +3,13 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getRestaurantWithMenu, type MenuItemWithRating } from "@/lib/restaurants/queries";
 import { getOwnClaimStatus } from "@/lib/claims/queries";
+import { getApprovedPhotosForTarget, getOwnPendingPhotosForTarget } from "@/lib/photos/queries";
 import { RatingBadge } from "@/components/rating-badge";
 import { ReportButton } from "@/components/report-button";
 import { ClaimRestaurantButton } from "@/components/claim-restaurant-button";
 import { OwnerApprovalToggle } from "@/components/owner-approval-toggle";
+import { PhotoUploadForm } from "@/components/photo-upload-form";
+import { PhotoGallery } from "@/components/photo-gallery";
 
 export default async function RestaurantPage({
   params,
@@ -29,6 +32,14 @@ export default async function RestaurantPage({
     !restaurant.owner_user_id && user
       ? await getOwnClaimStatus(supabase, restaurant.id, user.id)
       : null;
+
+  const [approvedPhotos, ownPendingPhotos] = await Promise.all([
+    getApprovedPhotosForTarget(supabase, "restaurant", restaurant.id),
+    user
+      ? getOwnPendingPhotosForTarget(supabase, "restaurant", restaurant.id, user.id)
+      : Promise.resolve([]),
+  ]);
+  const photos = [...approvedPhotos, ...ownPendingPhotos];
 
   const categories = new Map<string, MenuItemWithRating[]>();
   for (const item of items) {
@@ -65,6 +76,12 @@ export default async function RestaurantPage({
             initialStatus={claimStatus}
           />
         )}
+        <PhotoUploadForm
+          targetType="restaurant"
+          targetId={restaurant.id}
+          isSignedIn={!!user}
+          currentPath={`/restaurants/${restaurant.id}`}
+        />
       </div>
       {isOwner && (
         <OwnerApprovalToggle
@@ -72,6 +89,7 @@ export default async function RestaurantPage({
           requireOwnerApproval={restaurant.require_owner_approval}
         />
       )}
+      <PhotoGallery photos={photos} isSignedIn={!!user} currentPath={`/restaurants/${restaurant.id}`} />
 
       {items.length === 0 ? (
         <p className="mt-8 text-gray-500">No menu items yet.</p>
