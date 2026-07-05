@@ -203,44 +203,48 @@ export default async function SearchPage({
                           return (
                             <li key={dish.name} className="border-t border-dashed border-rule pt-3">
                               <details>
-                                <summary className="flex cursor-pointer items-baseline justify-between gap-4">
-                                  <span className="font-medium underline">{dish.name}</span>
-                                  <span className="text-sm text-ink-soft">
-                                    {dish.items.length} {dish.items.length === 1 ? "location" : "locations"}
-                                  </span>
+                                <summary className="cursor-pointer">
+                                  <div className="flex items-baseline justify-between gap-4">
+                                    <span className="font-medium underline">{dish.name}</span>
+                                    <span className="text-sm text-ink-soft">
+                                      {dish.items.length} {dish.items.length === 1 ? "location" : "locations"}
+                                    </span>
+                                  </div>
+                                  <div className="mt-1">
+                                    <RatingBadge rating={brandRating} label={`All ${group.label} locations`} />
+                                  </div>
                                 </summary>
-                                <div className="mt-2">
-                                  <RatingBadge rating={brandRating} label={`All ${group.label} locations`} />
+                                <div className="mt-3 flex flex-col gap-3">
+                                  <Link
+                                    href={`/brands/${group.brandId}/dishes/${encodeURIComponent(dish.name)}`}
+                                    className="inline-block self-start rounded bg-olive px-3 py-1.5 text-sm font-medium text-white transition hover:opacity-90"
+                                  >
+                                    View full details →
+                                  </Link>
+                                  <ul className="flex flex-col gap-2">
+                                    {dish.items.map((item) => (
+                                      <li key={item.id} className="border-l-2 border-rule pl-3">
+                                        <div className="flex items-baseline justify-between gap-4">
+                                          <Link
+                                            href={`/restaurants/${item.restaurant_id}`}
+                                            className="text-sm underline"
+                                          >
+                                            {item.restaurant_name}
+                                          </Link>
+                                          {item.price != null && (
+                                            <span className="text-xs text-ink-soft">
+                                              ${item.price.toFixed(2)} {item.currency}
+                                            </span>
+                                          )}
+                                        </div>
+                                        <RatingBadge
+                                          rating={{ avg_score: item.avg_score, rating_count: item.rating_count }}
+                                          label="This location"
+                                        />
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
-                                <ul className="mt-2 flex flex-col gap-2">
-                                  {dish.items.map((item) => (
-                                    <li key={item.id} className="border-l-2 border-rule pl-3">
-                                      <div className="flex items-baseline justify-between gap-4">
-                                        <Link
-                                          href={`/restaurants/${item.restaurant_id}`}
-                                          className="text-sm underline"
-                                        >
-                                          {item.restaurant_name}
-                                        </Link>
-                                        {item.price != null && (
-                                          <span className="text-xs text-ink-soft">
-                                            ${item.price.toFixed(2)} {item.currency}
-                                          </span>
-                                        )}
-                                      </div>
-                                      <RatingBadge
-                                        rating={{ avg_score: item.avg_score, rating_count: item.rating_count }}
-                                        label="This location"
-                                      />
-                                    </li>
-                                  ))}
-                                </ul>
-                                <Link
-                                  href={`/brands/${group.brandId}/dishes/${encodeURIComponent(dish.name)}`}
-                                  className="mt-2 inline-block text-xs text-ink-soft underline"
-                                >
-                                  View full details →
-                                </Link>
                               </details>
                             </li>
                           );
