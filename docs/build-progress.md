@@ -53,16 +53,35 @@ fragile generic HTML heuristics. Fuzzy dedup (name + address, `pg_trgm`) prevent
 restaurant rows at ingestion. Pages are rendered with a real headless browser (`scraper/browser.mjs`,
 Playwright) before parsing, not a plain fetch, since real sites are often JavaScript-rendered.
 
-**Real-world research (post-step-9, not yet reflected in any ingested data):** checked 10 real
-sites for usable structured data — 4 major fast-food chains (Tim Hortons, Wendy's, Mary Brown's
-rendered fully but emit zero Restaurant/Menu schema; McDonald's blocks automated browser requests
-outright) and 6 real independent Ottawa restaurants (Cocotte, Riviera, Supply & Demand, Alora,
-SideDoor, Rabbit Hole). One partial hit: **SideDoor Ottawa** (Wix-built) emits real `Restaurant`
-schema — accurate name/address/geo/hours — but, like every other site checked, no `MenuItem` data
-for actual dishes. Conclusion: menu-item-level structured data is genuinely rare in the wild, rarer
-than restaurant-level data. Options to revisit later: keep hunting for a fully-compatible site,
-extend the scraper to do partial ingestion (restaurant-only, no items, relying on step 8's
-crowd-contribution flow to fill in dishes), or leave as a documented limitation.
+**Real-world research:** checked 10 real sites for usable structured data — 4 major fast-food
+chains (Tim Hortons, Wendy's, Mary Brown's rendered fully but emit zero Restaurant/Menu schema;
+McDonald's blocks automated browser requests outright) and 6 real independent Ottawa restaurants.
+Conclusion: menu-item-level structured data is genuinely rare in the wild, rarer than
+restaurant-level data (schema.org scraping remains available in `scraper/` for the rare site that
+does emit it, but isn't the primary ingestion path today).
+
+**First real data batch (ingested):** pivoted to AI-assisted manual research (reading each
+restaurant's own official site directly, never aggregators, never fabricating unlisted items or
+prices) to seed the database with real Ottawa-area restaurants. Ingested via
+`scripts/ingest-batch1.mjs` (reuses `scraper/geocode.mjs` + `scraper/ingest.mjs`'s dedup-safe
+`ingestRestaurant()`), sourced from `scripts/data/*.mjs`:
+
+- **59 restaurants**, **5,791 menu items**, all real, all from official sources.
+- 14 independents (Cocotte, Riviera, Supply & Demand, Rabbit Hole, JOEY Lansdowne, 4 Ottawa pizza
+  spots, Delicious Steakhouse, Hidden Taste, Rangoli, Cucina da Vito, Saigon Bistro).
+- 8 chains across 45 Ottawa-area locations (Lone Star Texas Grill, Boston Pizza, Montana's BBQ &
+  Bar, Chuck's Roadhouse, Moxie's, State & Main, St. Louis Bar and Grill, The Royal Oak).
+- A few sites had no readable menu (LaHa Tacos, Golden Fries — JS ordering widgets; Soul Stone —
+  PDF-of-images menu; The Bad Alibi — blocks automated access) and were left out rather than
+  guessed at.
+- The Royal Oak's own site 403s automated fetches entirely; its data came from Wayback Machine
+  snapshots instead (still the restaurant's own real, official content, just retrieved via
+  archive.org rather than the live site).
+- Verified live on `/restaurants` and a couple of detail pages post-ingestion (category grouping,
+  per-location vs. all-locations rating comparison for chains).
+- Not yet collected: menu item `description` text (schema supports it — nullable column already
+  exists — just wasn't part of this research pass) and a few large beverage/wine sublists were
+  trimmed for brevity on a couple of chains.
 
 ### ⬜ Step 10 — Restaurant claim flow
 Not started.
@@ -81,9 +100,10 @@ Not started.
 ## Known gaps to revisit before real users
 
 - Email confirmation is off — re-enable in `supabase/config.toml` before launch.
-- `scraper/sources.mjs` has no real restaurant URLs yet — the pipeline is proven against test
-  fixtures, but real-world research found menu-item-level structured data genuinely rare (see step
-  9 notes above) and hasn't ingested a real site yet.
+- `scraper/sources.mjs` has no real restaurant URLs yet — the automated schema.org scraping path
+  is proven against test fixtures, but real-world research found menu-item-level structured data
+  genuinely rare (see step 9 notes above). Real data now comes from the manual-research batch
+  instead (`scripts/ingest-batch1.mjs`), not the automated scraper.
 - The footer's "claim or request removal" link is a placeholder `mailto:` until step 10 builds the
   real claim flow.
 - No deployment/hosting exists yet.
