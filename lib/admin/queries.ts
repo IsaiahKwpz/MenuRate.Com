@@ -22,12 +22,9 @@ export type ReportWithPreview = Database["public"]["Tables"]["reports"]["Row"] &
 // see their own reports, but the moderation queue needs to see all of them,
 // including the reporter_id IS NULL rows step 6's anomaly detection writes.
 export async function getOpenReports(admin: TypedClient): Promise<ReportWithPreview[]> {
-  const { data: reports, error } = await admin
-    .from("reports")
-    .select("*")
-    .eq("status", "open")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
+  const reports = await paginateAll((from, to) =>
+    admin.from("reports").select("*").eq("status", "open").order("created_at", { ascending: true }).range(from, to),
+  );
 
   const reporterIds = [
     ...new Set(reports.map((r) => r.reporter_id).filter((id): id is string => !!id)),
@@ -156,46 +153,54 @@ export async function getAllRestaurantsForMerge(admin: TypedClient) {
 // applies to any admin row component that would otherwise format
 // created_at itself.
 export async function getPendingEdits(admin: TypedClient) {
-  const { data, error } = await admin
-    .from("pending_edits")
-    .select("*, menu_item:menu_items(name), user:profiles!pending_edits_user_id_fkey(display_name)")
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
+  const data = await paginateAll((from, to) =>
+    admin
+      .from("pending_edits")
+      .select("*, menu_item:menu_items(name), user:profiles!pending_edits_user_id_fkey(display_name)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .range(from, to),
+  );
   return data.map((edit) => ({ ...edit, createdAtLabel: new Date(edit.created_at).toLocaleString() }));
 }
 
 export async function getPendingTags(admin: TypedClient) {
-  const { data, error } = await admin
-    .from("pending_tags")
-    .select("*, proposer:profiles!pending_tags_proposed_by_fkey(display_name)")
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
+  const data = await paginateAll((from, to) =>
+    admin
+      .from("pending_tags")
+      .select("*, proposer:profiles!pending_tags_proposed_by_fkey(display_name)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .range(from, to),
+  );
   return data.map((tag) => ({ ...tag, createdAtLabel: new Date(tag.created_at).toLocaleString() }));
 }
 
 export async function getPendingClaims(admin: TypedClient) {
-  const { data, error } = await admin
-    .from("restaurant_claims")
-    .select(
-      "*, restaurant:restaurants(name, address), claimant:profiles!restaurant_claims_user_id_fkey(display_name)",
-    )
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
+  const data = await paginateAll((from, to) =>
+    admin
+      .from("restaurant_claims")
+      .select(
+        "*, restaurant:restaurants(name, address), claimant:profiles!restaurant_claims_user_id_fkey(display_name)",
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .range(from, to),
+  );
   return data.map((claim) => ({ ...claim, createdAtLabel: new Date(claim.created_at).toLocaleString() }));
 }
 
 // Every upload lands here today, not just ones an automated scan flagged as
 // borderline - see lib/moderation/scan.ts for why (no API configured yet).
 export async function getPendingPhotos(admin: TypedClient) {
-  const { data, error } = await admin
-    .from("photos")
-    .select("*, uploader:profiles!photos_uploaded_by_fkey(display_name)")
-    .eq("status", "pending")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
+  const data = await paginateAll((from, to) =>
+    admin
+      .from("photos")
+      .select("*, uploader:profiles!photos_uploaded_by_fkey(display_name)")
+      .eq("status", "pending")
+      .order("created_at", { ascending: true })
+      .range(from, to),
+  );
 
   const menuItemIds = data.filter((p) => p.target_type === "menu_item").map((p) => p.target_id);
   const restaurantIds = data.filter((p) => p.target_type === "restaurant").map((p) => p.target_id);
