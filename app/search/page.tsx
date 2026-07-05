@@ -4,6 +4,7 @@ import {
   searchRestaurants,
   searchMenuItems,
   searchMenuItemsByTags,
+  browseMenuItems,
   getBrowseCategories,
   groupSearchResults,
   getBrandItemRatings,
@@ -31,6 +32,8 @@ export default async function SearchPage({
   const query = q?.trim() ?? "";
   const tagIds = tags ? tags.split(",").filter(Boolean) : [];
   const hasSearch = query.length > 0 || tagIds.length > 0;
+  const hasFilters = Boolean(minPrice || maxPrice || minRating);
+  const showResults = hasSearch || hasFilters;
   const supabase = await createClient();
   const categories = await getBrowseCategories(supabase);
 
@@ -40,22 +43,25 @@ export default async function SearchPage({
   let topDishes: Awaited<ReturnType<typeof getTopRatedDishes>> = [];
   let topRestaurants: Awaited<ReturnType<typeof getTopRatedRestaurants>> = [];
 
-  if (!hasSearch) {
+  if (!showResults) {
     [topDishes, topRestaurants] = await Promise.all([
       getTopRatedDishes(supabase),
       getTopRatedRestaurants(supabase),
     ]);
   }
 
-  if (hasSearch) {
-    const [restaurantsResult, rawMenuItems]: [
-      Awaited<ReturnType<typeof searchRestaurants>>,
-      MenuItemSearchResult[],
-    ] = await Promise.all([
-      tagIds.length > 0 ? Promise.resolve([]) : searchRestaurants(supabase, query),
-      tagIds.length > 0 ? searchMenuItemsByTags(supabase, tagIds) : searchMenuItems(supabase, query),
-    ]);
-    restaurants = restaurantsResult;
+  if (showResults) {
+    let rawMenuItems: MenuItemSearchResult[];
+    if (hasSearch) {
+      const [restaurantsResult, itemsResult] = await Promise.all([
+        tagIds.length > 0 ? Promise.resolve([]) : searchRestaurants(supabase, query),
+        tagIds.length > 0 ? searchMenuItemsByTags(supabase, tagIds) : searchMenuItems(supabase, query),
+      ]);
+      restaurants = restaurantsResult;
+      rawMenuItems = itemsResult;
+    } else {
+      rawMenuItems = await browseMenuItems(supabase);
+    }
 
     const menuItems = filterMenuItems(rawMenuItems, {
       minPrice: minPrice ? Number(minPrice) : undefined,
@@ -79,9 +85,15 @@ export default async function SearchPage({
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
       <h1 className="font-display text-2xl font-bold">
-        {hasSearch ? <>Results for &ldquo;{heading}&rdquo;</> : "Browse by category"}
+        {hasSearch ? (
+          <>Results for &ldquo;{heading}&rdquo;</>
+        ) : hasFilters ? (
+          "Filtered dishes"
+        ) : (
+          "Browse by category"
+        )}
       </h1>
-      {!hasSearch && (
+      {!showResults && (
         <p className="mt-2 text-ink-soft">Or search for a restaurant or a dish above.</p>
       )}
 
@@ -99,24 +111,22 @@ export default async function SearchPage({
               minRating={minRating}
             />
           </div>
-          {hasSearch && (
-            <div>
-              <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wide text-ink-soft">
-                Filters
-              </h2>
-              <SearchFilters
-                q={tagIds.length > 0 ? undefined : query}
-                tags={tagIds.length > 0 ? tagIds.join(",") : undefined}
-                minPrice={minPrice}
-                maxPrice={maxPrice}
-                minRating={minRating}
-              />
-            </div>
-          )}
+          <div>
+            <h2 className="mb-2 font-display text-sm font-bold uppercase tracking-wide text-ink-soft">
+              Filters
+            </h2>
+            <SearchFilters
+              q={tagIds.length > 0 ? undefined : query}
+              tags={tagIds.length > 0 ? tagIds.join(",") : undefined}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              minRating={minRating}
+            />
+          </div>
         </aside>
 
         <div className="flex flex-col gap-8">
-          {!hasSearch && (
+          {!showResults && (
             <>
               <p className="text-sm text-ink-soft">
                 Pick a category from the sidebar, or use the search bar above.
@@ -199,7 +209,7 @@ export default async function SearchPage({
             </section>
           )}
 
-          {hasSearch && (
+          {showResults && (
             <section>
               <h2 className="mb-3 font-display text-lg font-bold">Dishes</h2>
               {groups.length === 0 ? (

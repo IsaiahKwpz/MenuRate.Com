@@ -649,6 +649,22 @@ export type Database = {
       }
     }
     Functions: {
+      browse_menu_items: {
+        Args: { result_limit?: number }
+        Returns: {
+          avg_score: number
+          brand_id: string
+          brand_name: string
+          category: string
+          currency: string
+          id: string
+          name: string
+          price: number
+          rating_count: number
+          restaurant_id: string
+          restaurant_name: string
+        }[]
+      }
       count_rated_restaurants: { Args: never; Returns: number }
       decrement_trust_score: {
         Args: { target_user_id: string }

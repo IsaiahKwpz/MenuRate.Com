@@ -88,6 +88,15 @@ export async function searchMenuItemsByTags(
   return data;
 }
 
+// Backs price/rating-only filtering (no query, no category picked) - the
+// filter sidebar used to only appear once a query or tag was chosen, so
+// there was nothing to filter on its own.
+export async function browseMenuItems(supabase: TypedClient, limit = 300): Promise<MenuItemSearchResult[]> {
+  const { data, error } = await supabase.rpc("browse_menu_items", { result_limit: limit });
+  if (error) throw error;
+  return data;
+}
+
 export function filterMenuItems(
   items: MenuItemSearchResult[],
   filters: { minPrice?: number; maxPrice?: number; minRating?: number },
