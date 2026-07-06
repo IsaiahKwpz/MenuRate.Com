@@ -12,7 +12,8 @@ import { PhotoUploadForm } from "@/components/photo-upload-form";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { AddDishButton } from "@/components/add-dish-button";
 import { MenuCategoryFilter } from "@/components/menu-category-filter";
-import { LocationSnapshot } from "@/components/location-snapshot";
+import { LocationSnapshotDesktop } from "@/components/location-snapshot-desktop";
+import { LocationPopoutButton } from "@/components/location-popout-button";
 import { RestaurantEditForm } from "@/components/restaurant-edit-form";
 import { RatingBadge } from "@/components/rating-badge";
 import { RestaurantRatingForm } from "@/components/restaurant-rating-form";
@@ -101,6 +102,7 @@ export default async function RestaurantPage({
             </span>
           )}
           <div className="mt-2 flex flex-wrap items-center gap-3">
+            <LocationPopoutButton lat={restaurant.lat} lng={restaurant.lng} address={restaurant.address} />
             <ReportButton
               targetType="restaurant"
               targetId={restaurant.id}
@@ -187,7 +189,7 @@ export default async function RestaurantPage({
         </div>
 
         <aside className="flex flex-col gap-6">
-          <LocationSnapshot lat={restaurant.lat} lng={restaurant.lng} address={restaurant.address} />
+          <LocationSnapshotDesktop lat={restaurant.lat} lng={restaurant.lng} address={restaurant.address} />
           <PhotoGallery photos={photos} isSignedIn={!!user} currentPath={currentPath} />
 
           <div>
